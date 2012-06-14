@@ -54,7 +54,7 @@ __attribute__ ((section(".isr_vector"))) void (* const isr_vectors[])() =
 #endif
 };
 
-void reset_handler()
+void reset_handler(void)
 {
     main();
 }
