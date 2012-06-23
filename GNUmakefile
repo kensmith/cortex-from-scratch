@@ -22,7 +22,7 @@ secondary-processed := $(filter-out boot.%,$(objs))
 preprocs := $(if $(preproc),$(secondary-processed:.o=.E))
 genassms := $(if $(genassm),$(secondary-processed:.o=.S))
 
-output-suffixes := .elf .bin
+output-suffixes := .elf .bin .xxd
 
 .PHONY: app flash clean
 app: \
@@ -37,21 +37,29 @@ clean:; rm -f $(sort $(strip \
     *.S \
     app.elf \
     app.bin \
-    app.map))
+    app.map \
+    app.xxd))
+
+app.xxd \
+    : app.bin \
+    ; xxd $< > $@
 
 app.bin \
     : app.elf \
-    ; arm-elf-objcopy $< -O binary $@
+    ; arm-none-eabi-objcopy $< -O binary $@
 
 app.elf \
     : $(objs) \
-    ; $(strip arm-elf-g++ \
+    ; $(strip arm-none-eabi-g++ \
+      -mthumb \
       -nostartfiles \
       -std=gnu++0x \
-      -mthumb \
       -mfpu=vfp \
       -mcpu=cortex-m3 \
+      -march=armv7-m \
       -msoft-float \
+      -fno-rtti \
+      -fno-exceptions \
       $(objs) \
       -Xlinker -M -Xlinker -Map=app.map \
       -T $(linker-script) \
@@ -65,7 +73,8 @@ assembler-flags := $(strip \
     -mthumb \
     -msoft-float \
     -mfpu=vfp \
-    -mcpu=cortex-m3)
+    -mcpu=cortex-m3 \
+    -march=armv7-m)
 
 compiler-flags = $(strip \
     $(if $(filter ARM%,$@), \
@@ -85,7 +94,6 @@ compiler-flags = $(strip \
 c-compiler-flags = \
     $(compiler-flags) \
     -std=gnu99 \
-    -Wstrict-prototypes \
     -Wmissing-prototypes
 
 c++-compiler-flags = \
@@ -95,28 +103,28 @@ c++-compiler-flags = \
 
 %.o \
     : %.s $(common-deps) \
-    ; arm-elf-gcc $(assembler-flags) $< -c -o $@
+    ; arm-none-eabi-gcc $(assembler-flags) $< -c -o $@
 
 
 %.o \
     : %.c $(common-deps) \
-    ; arm-elf-gcc $(c-compiler-flags) $< -c -o $@
+    ; arm-none-eabi-gcc $(c-compiler-flags) $< -c -o $@
 %.E \
     : %.c $(common-deps) \
-    ; arm-elf-gcc $(c-compiler-flags) $< -E -o $@
+    ; arm-none-eabi-gcc $(c-compiler-flags) $< -E -o $@
 %.S \
     : %.c $(common-deps) \
-    ; arm-elf-gcc $(c-compiler-flags) $< -S -o $@
+    ; arm-none-eabi-gcc $(c-compiler-flags) $< -S -o $@
 
 
 %.o \
     : %.cpp $(common-deps) \
-    ; arm-elf-g++ $(c++-compiler-flags) $< -c -o $@
+    ; arm-none-eabi-g++ $(c++-compiler-flags) $< -c -o $@
 %.E \
     : %.cpp $(common-deps) \
-    ; arm-elf-g++ $(c++-compiler-flags) $< -E -o $@
+    ; arm-none-eabi-g++ $(c++-compiler-flags) $< -E -o $@
 %.S \
     : %.cpp $(common-deps) \
-    ; arm-elf-g++ $(c++-compiler-flags) $< -S -o $@
+    ; arm-none-eabi-g++ $(c++-compiler-flags) $< -S -o $@
 
 -include $(header-deps)

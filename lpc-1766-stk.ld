@@ -12,7 +12,10 @@ SECTIONS
 {
     .text :
     {
-        *(.isr_vector)
+        . = 0x0;
+        *(.isr_vector_first_seven)
+        *(.isr_vector_rest)
+        . = 0x400;
         *(.text*)
         *(.rodata*)
         *(.ARM.extab* .gnu.linkonce.armextab.*)
