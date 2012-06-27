@@ -3,7 +3,7 @@
 extern void (* const isr_vectors[])(void);
 extern void * __stack_top;
 
-void reset_handler(void);
+void reset_handler(void)  __attribute__ ((interrupt ("IRQ")));
 #if 0
 void nmi_handler();
 void hard_fault_handler();

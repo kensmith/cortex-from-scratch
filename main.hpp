@@ -1,4 +1,4 @@
 #pragma once
 
-long fact(long x);
+//long fact(long x);
 int main(void);

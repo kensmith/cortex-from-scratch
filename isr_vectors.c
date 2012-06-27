@@ -10,12 +10,13 @@ __attribute__ ((section(".isr_vector_first_seven"))) void (* const isr_vectors[]
     reset_handler,
     reset_handler,
     reset_handler,
-    (void (*)()) 0xefff5f3a,
+    (void (*)()) 0xefff6732,
 };
 
 void reset_handler(void)
 {
-    main();
+   //_start();
+   main();
 }
 
 #if 0

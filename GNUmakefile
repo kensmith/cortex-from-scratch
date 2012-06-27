@@ -52,8 +52,8 @@ app.elf \
     : $(objs) \
     ; $(strip arm-none-eabi-g++ \
       -mthumb \
-      -nostartfiles \
       -std=gnu++0x \
+      -nostartfiles \
       -mfpu=vfp \
       -mcpu=cortex-m3 \
       -march=armv7-m \
