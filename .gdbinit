@@ -12,12 +12,11 @@ define flash
     #monitor flash write_image app.elf
     monitor flash write_image app.bin 0x0 bin
     symbol-file app.elf
-    monitor reset halt
+    monitor reset init
 end
 
 define reboot
-    monitor reset halt
-    continue
+    monitor reset init
 end
 
 define flashboot

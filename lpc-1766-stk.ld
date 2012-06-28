@@ -10,11 +10,33 @@ ENTRY(reset_handler)
 
 SECTIONS
 {
+    __ram_top = ORIGIN(SRAM) + LENGTH(SRAM);
+    __initial_sp = __ram_top - 16;
+
     . = ALIGN(4);
     .text :
     {
         . = 0x0;
-        *(.isr_vector_first_seven)
+        LONG(__initial_sp)
+        *(.isr_vector_first_six)
+
+        /* vector table checksum */
+        LONG(
+            -(
+                __initial_sp
+                + reset_handler
+                + nmi_handler
+                + hard_fault_handler
+                + memory_management_fault_handler
+                + bus_fault_handler
+                + usage_fault_handler
+                + 6
+            )
+        )
+
+        . = 0x2c;
+        *(.isr_sv_call)
+        . = 0x3c;
         *(.isr_vector_rest)
         . = 0x400;
         *(.text*)
@@ -65,9 +87,6 @@ SECTIONS
     /* Why, oh why does newlib use such a generic name for a global?!? */
     PROVIDE(end = __heap_end);
     PROVIDE(__end__ = __heap_end);
-
-    __ram_top = ORIGIN(SRAM) + LENGTH(SRAM);
-    __stack_top = __ram_top - 16;
 
     /DISCARD/ :
     {
