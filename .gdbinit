@@ -17,6 +17,7 @@ end
 
 define reboot
     monitor reset init
+    continue
 end
 
 define flashboot
