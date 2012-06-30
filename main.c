@@ -18,7 +18,7 @@ static volatile unsigned * const cclkcfg = (volatile unsigned *) 0x400fc104;
    end_critical(); \
 } while (0)
 
-int main(void)
+void configure_pll0(void)
 {
    *scs = (1<<5); // enable main oscillator
    while (0 == (*scs & (1<<6)))
@@ -101,6 +101,12 @@ int main(void)
 
    *pll0con = 3;
    feed_pll();
+
+}
+
+int main(void)
+{
+   configure_pll0();
 
    volatile int i=0,j=0;
    while(1)
