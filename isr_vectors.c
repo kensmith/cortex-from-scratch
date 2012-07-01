@@ -59,7 +59,6 @@ __attribute__ ((section(".isr_vector_rest"))) void (* const isr_vector_rest[])()
 
 void reset_handler(void)
 {
-   configure_pll0();
    main();
 
    while(1);

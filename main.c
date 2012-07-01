@@ -7,6 +7,15 @@ static volatile unsigned * const pll0feed = (volatile unsigned *) 0x400fc08c;
 static volatile unsigned * const clksrcsel = (volatile unsigned *) 0x400fc10c;
 static volatile unsigned * const pll0cfg = (volatile unsigned *) 0x400fc084;
 static volatile unsigned * const cclkcfg = (volatile unsigned *) 0x400fc104;
+static volatile unsigned * const pclksel0 = (volatile unsigned *) 0x400fc1a8;
+
+static volatile unsigned * const u0lcr = (volatile unsigned *) 0x4000c00c;
+static volatile unsigned * const u0dll = (volatile unsigned *) 0x4000c000;
+static volatile unsigned * const u0dlm = (volatile unsigned *) 0x4000c004;
+static volatile unsigned * const u0fdr = (volatile unsigned *) 0x4000c028;
+static volatile unsigned * const u0fcr = (volatile unsigned *) 0x4000c008;
+static volatile unsigned * const pinsel0 = (volatile unsigned *) 0x4002c000;
+static volatile unsigned * const pinmode0 = (volatile unsigned *) 0x4002c040;
 
 #define start_critical() do {/*TODO*/} while (0);
 #define end_critical() do {/*TODO*/} while (0);
@@ -108,10 +117,47 @@ int main(void)
 {
    configure_pll0();
 
+   // set pclk to cclk / 8
+   // cclk = 96MHz
+   // pclk = 12MHz
+   unsigned x = *pclksel0;
+   x = x | (3<<6);
+   *pclksel0 = x;
+   *u0lcr =
+      0x3 // 8 bits
+      | (0<<2) // 1 stop bit
+      | (0<<3) // no parity
+      | (1<<7) // enable access to divisor latches
+      ;
+
+   // 115200
+   *u0dll = 4;
+   *u0dlm = 0;
+   *u0fdr =
+      (5<<0) // divaddval = 5
+      | (8<<4) // mulval = 8
+      ;
+
+   *u0fcr =
+      (1<<0) // enable FIFO
+      | (1<<2) // reset the TX FIFO
+      ;
+
+   x = *pinsel0;
+   x |=
+      (1<<4) // enable TXD0 pin
+      | (1<<6) // enable RXD0 pin
+      ;
+   *pinsel0 = x;
+
+   //*pinmode0   
+      
+
    volatile int i=0,j=0;
    while(1)
    {
       ++i;
       --j;
+
    }
 }
