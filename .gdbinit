@@ -8,9 +8,11 @@ end
 
 define flash
     #monitor soft_reset_halt
-    monitor reset halt
+    monitor reset init
+    monitor halt
     #monitor flash write_image app.elf
-    monitor flash write_image app.bin 0x0 bin
+    monitor flash write_image erase unlock app.bin 0x0 bin
+    monitor verify_image app.bin 0x0 bin
     symbol-file app.elf
     monitor reset init
 end

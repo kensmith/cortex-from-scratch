@@ -16,6 +16,8 @@ static volatile unsigned * const u0fdr = (volatile unsigned *) 0x4000c028;
 static volatile unsigned * const u0fcr = (volatile unsigned *) 0x4000c008;
 static volatile unsigned * const pinsel0 = (volatile unsigned *) 0x4002c000;
 static volatile unsigned * const pinmode0 = (volatile unsigned *) 0x4002c040;
+static volatile unsigned * const u0thr = (volatile unsigned *) 0x4000c000;
+static volatile unsigned * const u0lsr = (volatile unsigned *) 0x4000c014;
 
 #define start_critical() do {/*TODO*/} while (0);
 #define end_critical() do {/*TODO*/} while (0);
@@ -115,7 +117,7 @@ void configure_pll0(void)
 
 int main(void)
 {
-   configure_pll0();
+   //configure_pll0();
 
    // set pclk to cclk / 8
    // cclk = 96MHz
@@ -145,19 +147,30 @@ int main(void)
 
    x = *pinsel0;
    x |=
-      (1<<4) // enable TXD0 pin
-      | (1<<6) // enable RXD0 pin
+      (1<<4) // enable TXD0 pin, GPIO Port 0.2
+      | (1<<6) // enable RXD0 pin, GPIO Port 0.3
       ;
    *pinsel0 = x;
 
+   // 00, pin has a pull-up resistor enabled.
+   // 01, pin has repeater mode enabled.
+   // 10, pin has neither pull-up nor pull-down.
+   // 11, has a pull-down resistor enabled.
    //*pinmode0   
+   // Do nothing to leave pull-up's enabled for now
       
+   // dlab
+   x = *u0lcr;
+   x &= ~(1<<7);
+   *u0lcr = x;
 
    volatile int i=0,j=0;
    while(1)
    {
+      
+      x = *u0lsr;
+      *u0thr = 'a';
       ++i;
       --j;
-
    }
 }
