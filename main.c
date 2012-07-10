@@ -112,7 +112,6 @@ void configure_pll0(void)
 
    *pll0con = 3;
    feed_pll();
-
 }
 
 int main(void)
