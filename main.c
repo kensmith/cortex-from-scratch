@@ -21,6 +21,8 @@ static volatile unsigned * const u0thr = (volatile unsigned *) 0x4000c000;
 static volatile unsigned * const u0lsr = (volatile unsigned *) 0x4000c014;
 static volatile unsigned * const flashcfg = (volatile unsigned *) 0x400fc000;
 
+static volatile unsigned * const pconp = (volatile unsigned *) 0x400fc0c4;
+
 #define start_critical() do {/*TODO*/} while (0);
 #define end_critical() do {/*TODO*/} while (0);
 
@@ -121,16 +123,9 @@ int main(void)
 {
    configure_pll0();
 
-   while (1) {
-      // chill
-   }
+   // light up all the peripherals
+   *pconp = ~0;
 
-   // set pclk to cclk / 8
-   // cclk = 96MHz
-   // pclk = 12MHz
-   unsigned x = *pclksel0;
-   x = x | (3<<6);
-   *pclksel0 = x;
    *u0lcr =
       0x3 // 8 bits
       | (0<<2) // 1 stop bit
@@ -138,8 +133,9 @@ int main(void)
       | (1<<7) // enable access to divisor latches
       ;
 
+   // pclk is 96/4 = 24MHz
    // 115200
-   *u0dll = 4;
+   *u0dll = 8;
    *u0dlm = 0;
    *u0fdr =
       (5<<0) // divaddval = 5
@@ -151,12 +147,10 @@ int main(void)
       | (1<<2) // reset the TX FIFO
       ;
 
-   x = *pinsel0;
-   x |=
+   *pinsel0 |=
       (1<<4) // enable TXD0 pin, GPIO Port 0.2
       | (1<<6) // enable RXD0 pin, GPIO Port 0.3
       ;
-   *pinsel0 = x;
 
    // 00, pin has a pull-up resistor enabled.
    // 01, pin has repeater mode enabled.
@@ -166,15 +160,13 @@ int main(void)
    // Do nothing to leave pull-up's enabled for now
       
    // dlab
-   x = *u0lcr;
-   x &= ~(1<<7);
-   *u0lcr = x;
+   *u0lcr &= ~(1<<7);
 
    volatile int i=0,j=0;
    while(1)
    {
       
-      x = *u0lsr;
+      volatile unsigned x = *u0lsr;
       *u0thr = 'a';
       ++i;
       --j;
