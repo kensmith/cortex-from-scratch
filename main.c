@@ -8,6 +8,7 @@ static volatile unsigned * const clksrcsel = (volatile unsigned *) 0x400fc10c;
 static volatile unsigned * const pll0cfg = (volatile unsigned *) 0x400fc084;
 static volatile unsigned * const cclkcfg = (volatile unsigned *) 0x400fc104;
 static volatile unsigned * const pclksel0 = (volatile unsigned *) 0x400fc1a8;
+static volatile unsigned * const pclksel1 = (volatile unsigned *) 0x400fc1ac;
 
 static volatile unsigned * const u0lcr = (volatile unsigned *) 0x4000c00c;
 static volatile unsigned * const u0dll = (volatile unsigned *) 0x4000c000;
@@ -18,6 +19,7 @@ static volatile unsigned * const pinsel0 = (volatile unsigned *) 0x4002c000;
 static volatile unsigned * const pinmode0 = (volatile unsigned *) 0x4002c040;
 static volatile unsigned * const u0thr = (volatile unsigned *) 0x4000c000;
 static volatile unsigned * const u0lsr = (volatile unsigned *) 0x4000c014;
+static volatile unsigned * const flashcfg = (volatile unsigned *) 0x400fc000;
 
 #define start_critical() do {/*TODO*/} while (0);
 #define end_critical() do {/*TODO*/} while (0);
@@ -31,6 +33,9 @@ static volatile unsigned * const u0lsr = (volatile unsigned *) 0x4000c014;
 
 void configure_pll0(void)
 {
+   // max wait state while configuring pll0
+   *flashcfg = (5<<12) | 0x3a;
+
    *scs = (1<<5); // enable main oscillator
    while (0 == (*scs & (1<<6)))
    {
@@ -39,20 +44,10 @@ void configure_pll0(void)
    // lpc17xx_um.pdf, 4.5.13 PLL0 setup sequence
    // 1. Disconnect PLL0 with one feed sequence if PLL0 is already connected.
    // ks: not necessary after reboot, defaults to disconnected    
+   *pll0con &= ~((unsigned) 1<<1);
+   feed_pll();
 
-
-   if (*pll0stat & (1<<25))
-   {
-      unsigned pll0con_value = *pll0con;
-      pll0con_value &= ~((unsigned) 1<<1);
-      *pll0con = pll0con_value;
-      feed_pll();
-   }
-
-   // 2. Disable PLL0 with one feed sequence.
-   // ks: not necessary after reboot, defaults to disabled
-
-   *pll0con = 0;
+   *pll0con &= ~((unsigned) 1<<0);
    feed_pll();
 
    // 3. Change the CPU Clock Divider setting to speed up operation without
@@ -75,12 +70,19 @@ void configure_pll0(void)
    // PLL0CFG = M-1 = 20-1 = 19 = 0x13
 
    *pll0cfg = (20-1);
+   //*pll0cfg = ((25-1)<<0) | ((2-1)<<16);
    feed_pll();
 
    // 6. Enable PLL0 with one feed sequence.
 
    *pll0con = 1;
    feed_pll();
+
+   while (0 == (*pll0stat & (1<<26)))
+   {
+      // wait
+   }
+
 
    // 7. Change the CPU Clock Divider setting for the operation with PLL0. It
    //    is critical to do this before connecting PLL0.
@@ -91,7 +93,8 @@ void configure_pll0(void)
    // CCLKSEL = 5 - 1 = 4
 
    *cclkcfg = 4;
-   feed_pll();
+   //*cclkcfg = 3-1;
+   //feed_pll();
 
    // 8. Wait for PLL0 to achieve lock by monitoring the PLOCK0 bit in the
    //    PLL0STAT register, or using the PLOCK0 interrupt, or wait for a fixed
@@ -102,21 +105,25 @@ void configure_pll0(void)
    //    these cases, the PLL may be assumed to be stable after a start-up time
    //    has passed. This time is 500 μs when FREF is greater than 400 kHz and 200
    //    / FREF seconds when FREF is less than 400 kHz.
-
-   while (0 == (*pll0stat & (1<<26)))
-   {
-      // wait
-   }
+   //
+   *pclksel0 = 0;
+   *pclksel1 = 0;
 
    // 9. Connect PLL0 with one feed sequence.
 
-   *pll0con = 3;
+   *pll0con |= 1<<1;
    feed_pll();
+
+   //*flashcfg = (4<<12) | 0x3a;
 }
 
 int main(void)
 {
-   //configure_pll0();
+   configure_pll0();
+
+   while (1) {
+      // chill
+   }
 
    // set pclk to cclk / 8
    // cclk = 96MHz
