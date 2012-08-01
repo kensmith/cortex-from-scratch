@@ -23,6 +23,11 @@ static volatile unsigned * const flashcfg = (volatile unsigned *) 0x400fc000;
 
 static volatile unsigned * const pconp = (volatile unsigned *) 0x400fc0c4;
 
+static volatile unsigned * const pinsel3 = (volatile unsigned *) 0x4002c00c;
+static volatile unsigned * const fio1dir = (volatile unsigned *) 0x2009c020;
+static volatile unsigned * const fio1set = (volatile unsigned *) 0x2009c038;
+static volatile unsigned * const fio1clr = (volatile unsigned *) 0x2009c03c;
+
 #define start_critical() do {/*TODO*/} while (0);
 #define end_critical() do {/*TODO*/} while (0);
 
@@ -121,54 +126,23 @@ void configure_pll0(void)
 
 int main(void)
 {
-   configure_pll0();
+   //configure_pll0();
 
    // light up all the peripherals
    *pconp = ~0;
 
-   *u0lcr =
-      0x3 // 8 bits
-      | (0<<2) // 1 stop bit
-      | (0<<3) // no parity
-      | (1<<7) // enable access to divisor latches
-      ;
+   // light led1
+   // pin 39 p1[25]
+   // pinsel3
+   //*pinsel3 = 0;
+   *fio1dir = 1<<25;
 
-   // pclk is 96/4 = 24MHz
-   // 115200
-   *u0dll = 8;
-   *u0dlm = 0;
-   *u0fdr =
-      (5<<0) // divaddval = 5
-      | (8<<4) // mulval = 8
-      ;
-
-   *u0fcr =
-      (1<<0) // enable FIFO
-      | (1<<2) // reset the TX FIFO
-      ;
-
-   *pinsel0 |=
-      (1<<4) // enable TXD0 pin, GPIO Port 0.2
-      | (1<<6) // enable RXD0 pin, GPIO Port 0.3
-      ;
-
-   // 00, pin has a pull-up resistor enabled.
-   // 01, pin has repeater mode enabled.
-   // 10, pin has neither pull-up nor pull-down.
-   // 11, has a pull-down resistor enabled.
-   //*pinmode0   
-   // Do nothing to leave pull-up's enabled for now
-      
-   // dlab
-   *u0lcr &= ~(1<<7);
-
-   volatile int i=0,j=0;
-   while(1)
+   // light led2
+   // pin 81 p0[4]
+   // pinsel0
+   while (1)
    {
-      
-      volatile unsigned x = *u0lsr;
-      *u0thr = 'a';
-      ++i;
-      --j;
+      for (int i = 1000; i > 0; --i) *fio1set = 1<<25;
+      for (int i = 10; i > 0; --i) *fio1clr = 1<<25;
    }
 }
