@@ -140,9 +140,11 @@ int main(void)
    // light led2
    // pin 81 p0[4]
    // pinsel0
+   int j = 0;
    while (1)
    {
-      for (int i = 1000; i > 0; --i) *fio1set = 1<<25;
-      for (int i = 10; i > 0; --i) *fio1clr = 1<<25;
+      for (int i = j; i > 0; --i) *fio1set = 1<<25;
+      for (int i = 100; i > 0; --i) *fio1clr = 1<<25;
+      ++j;
    }
 }
