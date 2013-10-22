@@ -28,15 +28,11 @@ static volatile unsigned * const fio1dir = (volatile unsigned *) 0x2009c020;
 static volatile unsigned * const fio1set = (volatile unsigned *) 0x2009c038;
 static volatile unsigned * const fio1clr = (volatile unsigned *) 0x2009c03c;
 
-#define start_critical() do {/*TODO*/} while (0)
-#define end_critical() do {/*TODO*/} while (0)
-
-#define feed_pll() do { \
-   start_critical(); \
-   *pll0feed = 0xaa; \
-   *pll0feed = 0x55; \
-   end_critical(); \
-} while (0)
+inline void feed_pll()
+{
+   *pll0feed = 0xaa;
+   *pll0feed = 0x55;
+}
 
 void configure_pll0(void)
 {
