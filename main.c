@@ -28,8 +28,8 @@ static volatile unsigned * const fio1dir = (volatile unsigned *) 0x2009c020;
 static volatile unsigned * const fio1set = (volatile unsigned *) 0x2009c038;
 static volatile unsigned * const fio1clr = (volatile unsigned *) 0x2009c03c;
 
-#define start_critical() do {/*TODO*/} while (0);
-#define end_critical() do {/*TODO*/} while (0);
+#define start_critical() do {/*TODO*/} while (0)
+#define end_critical() do {/*TODO*/} while (0)
 
 #define feed_pll() do { \
    start_critical(); \
