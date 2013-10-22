@@ -80,6 +80,25 @@ void configure_pll0(void)
    //*pll0cfg = ((25-1)<<0) | ((2-1)<<16);
    feed_pll();
 
+   // Errata
+   // PCLKSELx.1:Peripheral Clock Selection Registers must
+   // be set before enabling and connecting
+   // PLL0
+   // Introduction:A pair of bits in the Peripheral Clock
+   // Registers (PCLKSEL0 and PCLKSEL1) controls the rate of
+   // the clock signal that will be supplied to APB0 and
+   // APB1 peripherals.
+   // Problem:If the Peripheral Clock Registers (PCLKSEL0
+   // and PCLKSEL1) are set or changed after PLL0 is enabled
+   // and connected, the value written into the Peripheral
+   // Clock Selection Registers may not take effect. It is
+   // not possible to change the Peripheral Clock Selection
+   // settings once PLL0 is enabled and connected.
+   // Workaround:Peripheral Clock Selection Registers must
+   // be set before enabling and connecting PLL0.
+   *pclksel0 = 0;
+   *pclksel1 = 0;
+
    // 6. Enable PLL0 with one feed sequence.
 
    *pll0con = 1;
@@ -113,8 +132,12 @@ void configure_pll0(void)
    //    has passed. This time is 500 μs when FREF is greater than 400 kHz and 200
    //    / FREF seconds when FREF is less than 400 kHz.
    //
-   *pclksel0 = 0;
-   *pclksel1 = 0;
+
+   while (0 == (*pll0stat & (1<<26)))
+   {
+      // wait
+   }
+
 
    // 9. Connect PLL0 with one feed sequence.
 
@@ -126,7 +149,7 @@ void configure_pll0(void)
 
 int main(void)
 {
-   //configure_pll0();
+   configure_pll0();
 
    // light up all the peripherals
    *pconp = ~0;
