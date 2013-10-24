@@ -24,12 +24,12 @@ genassms := $(if $(genassm),$(secondary-processed:.o=.S))
 
 output-suffixes := .elf .bin .xxd
 
-.PHONY: app flash clean
+.PHONY: app flash clean gdb
 app: \
     $(addprefix app,$(output-suffixes)) \
     $(preprocs) \
     $(genassms)
-flash: app; ./flash.py app.bin
+flash: app; ./flash.py app.elf
 clean:; rm -f $(sort $(strip \
     *.d \
     *.o \
@@ -39,6 +39,9 @@ clean:; rm -f $(sort $(strip \
     app.bin \
     app.map \
     app.xxd))
+
+gdb:;\
+    arm-none-eabi-gdb
 
 app.xxd \
     : app.bin \
