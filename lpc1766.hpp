@@ -26,7 +26,6 @@ namespace lpc1766
       template <int which_pin>
       struct pin
       {
-         static_assert(0 <= which_pin && which_pin <= 31, "invalid pin");
          using dir = reg_t<rw_t, base_addr, which_pin, 1>;
          using set = reg_t<rw_t, base_addr + 0x18, which_pin, 1>;
          using clr = reg_t<wo_t, base_addr + 0x1c, which_pin, 1>;
