@@ -1,6 +1,7 @@
 #include "main.hpp"
 
 //TODO refactor register access
+// 1720 bytes before refactor
 // candidate instructions
 // SBFX Rd, Rn, #lsb, #width Signed Bit Field Extract - page 3-58
 // STR Rt, [Rn, #offset] Store Register word - page 3-17
@@ -9,6 +10,148 @@
 // STREX Rd, Rt, [Rn, #offset] Store Register Exclusive - page 3-31
 // STREXB Rd, Rt, [Rn] Store Register Exclusive Byte - page 3-31
 // STREXH Rd, Rt, [Rn] Store Register Exclusive Halfword - page 3-31
+
+struct ro_t
+{
+   static unsigned read(
+      volatile unsigned * device,
+      unsigned offset,
+      unsigned mask
+   )
+   { return (*device & mask) >> offset; } 
+};
+
+struct wo_t
+{
+   static void write(
+      volatile unsigned * device,
+      unsigned offset,
+      unsigned mask,
+      unsigned value
+   )
+   { *device = ((value << offset) & mask); }
+
+   static void set(
+      volatile unsigned * device,
+      unsigned mask
+   )
+   { *device = mask; }
+};
+
+struct rw_t : ro_t
+{
+   static void write(
+      volatile unsigned * device,
+      unsigned offset,
+      unsigned mask,
+      unsigned value
+   )
+   { *device = (*device & ~mask) | ((value << offset) & mask); }
+
+   static void set(
+      volatile unsigned * device,
+      unsigned mask
+   )
+   { *device = *device | mask; }
+
+   static void clear(
+      volatile unsigned * device,
+      unsigned mask
+   )
+   { *device = *device & ~mask; }
+};
+
+template <unsigned width>
+struct generate_unshifted_mask_t
+{
+   enum { value = (generate_unshifted_mask_t<width - 1>::value << 1) | 1 };
+};
+
+template <>
+struct generate_unshifted_mask_t<0>
+{
+   enum { value = 0 };
+};
+
+template <unsigned offset, unsigned width>
+struct generate_mask_t
+{
+   enum { value = generate_unshifted_mask_t<width>::value << offset };
+};
+
+template
+<
+   typename mutability_policy_t,
+   unsigned address,
+   unsigned offset,
+   unsigned width
+>
+struct reg_t
+{
+   static unsigned read()
+   {
+      return
+         mutability_policy_t::read(
+            reinterpret_cast<volatile unsigned *>(address),
+            offset,
+            generate_mask_t<offset, width>::value
+         );
+   }
+
+   static void write(unsigned value)
+   {
+      mutability_policy_t::write(
+         reinterpret_cast<volatile unsigned *>(address),
+         offset,
+         generate_mask_t<offset, width>::value,
+         value
+      );
+   }
+
+   static void set()
+   {
+      mutability_policy_t::set(
+         reinterpret_cast<volatile unsigned *>(address),
+         generate_mask_t<offset, width>::value
+      );
+   }
+
+   static void clear()
+   {
+      mutability_policy_t::clear(
+         reinterpret_cast<volatile unsigned *>(address),
+         generate_mask_t<offset, width>::value
+      );
+   }
+};
+
+struct lpc
+{
+   struct scs
+   {
+      static constexpr unsigned addr = 0x400fc1a0;
+      using oscrange = reg_t<rw_t, addr, 4, 1>;
+      using oscen = reg_t<rw_t, addr, 5, 1>;
+      using oscstat = reg_t<rw_t, addr, 6, 1>;
+      using whole = reg_t<rw_t, addr, 32, 0>;
+   };
+
+   template <int which_fio>
+   struct fio
+   {
+      static_assert(0 <= which_fio && which_fio <= 4, "invalid fio");
+      static constexpr unsigned base_addr = 0x2009c000 + 0x20*which_fio;
+
+      template <int which_pin>
+      struct pin
+      {
+         static_assert(0 <= which_pin && which_pin <= 31, "invalid pin");
+         using dir = reg_t<rw_t, base_addr, which_pin, 1>;
+         using set = reg_t<rw_t, base_addr + 0x18, which_pin, 1>;
+         using clr = reg_t<wo_t, base_addr + 0x1c, which_pin, 1>;
+      };
+   };
+};
 
 static volatile unsigned * const scs = (volatile unsigned *) 0x400fc1a0;
 static volatile unsigned * const pll0stat = (volatile unsigned *) 0x400fc088;
@@ -68,7 +211,38 @@ void configure_pll0(void)
 	.word	1074774144
 #endif
 
+
+#if 0
    *scs = (1<<5); // enable main oscillator
+/*
+	.loc 1 210 0
+	add	r3, r3, #416
+	movs	r2, #32
+	str	r2, [r3]
+ */
+#else
+   lpc::scs::oscen::set();
+   /*
+	.loc 1 46 0
+	add	r3, r3, #416
+	ldr	r2, [r3]
+	orr	r2, r2, #32
+	.loc 1 47 0
+	str	r2, [r3]
+    */
+
+   //lpc::scs::whole::write(1<<5);
+   /*
+	.loc 1 34 0
+	add	r3, r3, #416
+	ldr	r2, [r3]
+	.loc 1 36 0
+	str	r2, [r3]
+    */
+#endif
+
+
+
 #if 0
    movs	r2, #32
    str	r2, [r3, #416]
@@ -195,6 +369,25 @@ void configure_pll0(void)
 #endif
 }
 
+struct led_t
+{
+   static void enable()
+   {
+      lpc::fio<1>::pin<25>::dir::set();
+   }
+
+   static void on()
+   {
+      lpc::fio<1>::pin<25>::clr::set();
+   }
+
+   static void off()
+   {
+      lpc::fio<1>::pin<25>::set::set();
+   }
+};
+
+
 int main(void)
 {
    configure_pll0();
@@ -206,25 +399,20 @@ int main(void)
    // pin 39 p1[25]
    // pinsel3
    //*pinsel3 = 0;
-   *fio1dir = 1<<25;
-#if 0
-	ldr	r3, .L22+4
-	mov	r2, #33554432
-	str	r2, [r3]
-.L22:
-	.word	1074774212
-	.word	537509920
-	.word	537509944
-	.word	6400000
-	.word	537509948
-#endif
+   led_t::enable();
 
    // light led2
    // pin 81 p0[4]
    // pinsel0
    while (1)
    {
-      for (int i = 6400000; i > 0; --i) *fio1clr = 1<<25;
-      for (int i = 6400000; i > 0; --i) *fio1set = 1<<25;
+      for (int i = 6400000; i > 0; --i)
+      {
+         led_t::on();
+      }
+      for (int i = 6400000; i > 0; --i)
+      {
+         led_t::off();
+      }
    }
 }
