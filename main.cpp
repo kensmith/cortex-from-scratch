@@ -49,6 +49,7 @@ static volatile unsigned * const pinsel3 = (volatile unsigned *) 0x4002c00c;
 
 inline void feed_pll()
 {
+   // TODO refactor PLL configuration using reg_t
    *pll0feed = 0xaa;
 #if 0
 	movs	r2, #170
@@ -125,7 +126,10 @@ void configure_pll0(void)
    // lpc17xx_um.pdf, 4.5.13 PLL0 setup sequence
    // 1. Disconnect PLL0 with one feed sequence if PLL0 is already connected.
    // ks: not necessary after reboot, defaults to disconnected    
+#if 1
    *pll0con &= ~((unsigned) 1<<1);
+#else
+#endif
 #if 0
 	ldr	r3, .L5+4
 	ldr	r2, [r3]

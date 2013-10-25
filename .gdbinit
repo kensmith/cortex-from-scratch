@@ -1,6 +1,9 @@
 target remote localhost:3333
 symbol-file app.elf
 monitor poll on
+monitor reset 
+monitor wait 500
+monitor soft_reset_halt
 
 define hook-step
     mon cortex_m3 maskisr on

@@ -15,7 +15,7 @@ struct lpc1766
       using oscrange = reg_t<rw_t, addr, 4, 1>;
       using oscen = reg_t<rw_t, addr, 5, 1>;
       using oscstat = reg_t<rw_t, addr, 6, 1>;
-      using whole = reg_t<rw_t, addr, 32, 0>;
+      using whole = reg_t<rw_t, addr, 0, 32>;
    };
 
    template <int which_fio>
@@ -31,6 +31,19 @@ struct lpc1766
          using dir = reg_t<rw_t, base_addr, which_pin, 1>;
          using set = reg_t<rw_t, base_addr + 0x18, which_pin, 1>;
          using clr = reg_t<wo_t, base_addr + 0x1c, which_pin, 1>;
+      };
+   };
+
+   template <int which_pll>
+   struct pll
+   {
+      static_assert(0 <= which_pll && which_pll <= 1, "invalid pll");
+      static constexpr unsigned base_addr = 0x400fc080+0x20*which_pll;
+
+      struct con
+      {
+         using plle = reg_t<rw_t, base_addr, 0, 1>;
+         using pllc = reg_t<rw_t, base_addr, 1, 1>;
       };
    };
 };

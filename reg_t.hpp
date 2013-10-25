@@ -1,6 +1,7 @@
 #pragma once
 
 #include "generate_mask_t.hpp"
+#include <limits>
 
 /**
  * Model an MMIO register.
@@ -37,6 +38,10 @@ template
 >
 struct reg_t
 {
+   static_assert(width > 0, "invalid field of zero width");
+   static_assert(width + offset <= std::numeric_limits<unsigned>::digits,
+      "register width overflow");
+
    /**
     * Read the subregister.
     * @return the value
