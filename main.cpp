@@ -1,4 +1,7 @@
 #include "main.hpp"
+#include "lpc1766.hpp"
+
+using lpc = lpc1766;
 
 //TODO refactor register access
 // 1720 bytes before refactor
@@ -11,147 +14,7 @@
 // STREXB Rd, Rt, [Rn] Store Register Exclusive Byte - page 3-31
 // STREXH Rd, Rt, [Rn] Store Register Exclusive Halfword - page 3-31
 
-struct ro_t
-{
-   static unsigned read(
-      volatile unsigned * device,
-      unsigned offset,
-      unsigned mask
-   )
-   { return (*device & mask) >> offset; } 
-};
 
-struct wo_t
-{
-   static void write(
-      volatile unsigned * device,
-      unsigned offset,
-      unsigned mask,
-      unsigned value
-   )
-   { *device = ((value << offset) & mask); }
-
-   static void set(
-      volatile unsigned * device,
-      unsigned mask
-   )
-   { *device = mask; }
-};
-
-struct rw_t : ro_t
-{
-   static void write(
-      volatile unsigned * device,
-      unsigned offset,
-      unsigned mask,
-      unsigned value
-   )
-   { *device = (*device & ~mask) | ((value << offset) & mask); }
-
-   static void set(
-      volatile unsigned * device,
-      unsigned mask
-   )
-   { *device = *device | mask; }
-
-   static void clear(
-      volatile unsigned * device,
-      unsigned mask
-   )
-   { *device = *device & ~mask; }
-};
-
-template <unsigned width>
-struct generate_unshifted_mask_t
-{
-   enum { value = (generate_unshifted_mask_t<width - 1>::value << 1) | 1 };
-};
-
-template <>
-struct generate_unshifted_mask_t<0>
-{
-   enum { value = 0 };
-};
-
-template <unsigned offset, unsigned width>
-struct generate_mask_t
-{
-   enum { value = generate_unshifted_mask_t<width>::value << offset };
-};
-
-template
-<
-   typename mutability_policy_t,
-   unsigned address,
-   unsigned offset,
-   unsigned width
->
-struct reg_t
-{
-   static unsigned read()
-   {
-      return
-         mutability_policy_t::read(
-            reinterpret_cast<volatile unsigned *>(address),
-            offset,
-            generate_mask_t<offset, width>::value
-         );
-   }
-
-   static void write(unsigned value)
-   {
-      mutability_policy_t::write(
-         reinterpret_cast<volatile unsigned *>(address),
-         offset,
-         generate_mask_t<offset, width>::value,
-         value
-      );
-   }
-
-   static void set()
-   {
-      mutability_policy_t::set(
-         reinterpret_cast<volatile unsigned *>(address),
-         generate_mask_t<offset, width>::value
-      );
-   }
-
-   static void clear()
-   {
-      mutability_policy_t::clear(
-         reinterpret_cast<volatile unsigned *>(address),
-         generate_mask_t<offset, width>::value
-      );
-   }
-};
-
-struct lpc
-{
-   struct scs
-   {
-      static constexpr unsigned addr = 0x400fc1a0;
-      using oscrange = reg_t<rw_t, addr, 4, 1>;
-      using oscen = reg_t<rw_t, addr, 5, 1>;
-      using oscstat = reg_t<rw_t, addr, 6, 1>;
-      using whole = reg_t<rw_t, addr, 32, 0>;
-   };
-
-   template <int which_fio>
-   struct fio
-   {
-      static_assert(0 <= which_fio && which_fio <= 4, "invalid fio");
-      static constexpr unsigned base_addr = 0x2009c000 + 0x20*which_fio;
-
-      template <int which_pin>
-      struct pin
-      {
-         static_assert(0 <= which_pin && which_pin <= 31, "invalid pin");
-         using dir = reg_t<rw_t, base_addr, which_pin, 1>;
-         using set = reg_t<rw_t, base_addr + 0x18, which_pin, 1>;
-         using clr = reg_t<wo_t, base_addr + 0x1c, which_pin, 1>;
-      };
-   };
-};
 
 static volatile unsigned * const scs = (volatile unsigned *) 0x400fc1a0;
 static volatile unsigned * const pll0stat = (volatile unsigned *) 0x400fc088;
