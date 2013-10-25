@@ -1,5 +1,7 @@
 #include "main.hpp"
 
+//TODO refactor register access
+
 static volatile unsigned * const scs = (volatile unsigned *) 0x400fc1a0;
 static volatile unsigned * const pll0stat = (volatile unsigned *) 0x400fc088;
 static volatile unsigned * const pll0con = (volatile unsigned *) 0x400fc080;
