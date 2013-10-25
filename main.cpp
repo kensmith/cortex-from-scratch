@@ -10,6 +10,14 @@ static volatile unsigned * const cclkcfg = (volatile unsigned *) 0x400fc104;
 static volatile unsigned * const pclksel0 = (volatile unsigned *) 0x400fc1a8;
 static volatile unsigned * const pclksel1 = (volatile unsigned *) 0x400fc1ac;
 
+static volatile unsigned * const flashcfg = (volatile unsigned *) 0x400fc000;
+static volatile unsigned * const pconp = (volatile unsigned *) 0x400fc0c4;
+
+static volatile unsigned * const fio1dir = (volatile unsigned *) 0x2009c020;
+static volatile unsigned * const fio1set = (volatile unsigned *) 0x2009c038;
+static volatile unsigned * const fio1clr = (volatile unsigned *) 0x2009c03c;
+
+#if 0
 static volatile unsigned * const u0lcr = (volatile unsigned *) 0x4000c00c;
 static volatile unsigned * const u0dll = (volatile unsigned *) 0x4000c000;
 static volatile unsigned * const u0dlm = (volatile unsigned *) 0x4000c004;
@@ -19,14 +27,9 @@ static volatile unsigned * const pinsel0 = (volatile unsigned *) 0x4002c000;
 static volatile unsigned * const pinmode0 = (volatile unsigned *) 0x4002c040;
 static volatile unsigned * const u0thr = (volatile unsigned *) 0x4000c000;
 static volatile unsigned * const u0lsr = (volatile unsigned *) 0x4000c014;
-static volatile unsigned * const flashcfg = (volatile unsigned *) 0x400fc000;
-
-static volatile unsigned * const pconp = (volatile unsigned *) 0x400fc0c4;
 
 static volatile unsigned * const pinsel3 = (volatile unsigned *) 0x4002c00c;
-static volatile unsigned * const fio1dir = (volatile unsigned *) 0x2009c020;
-static volatile unsigned * const fio1set = (volatile unsigned *) 0x2009c038;
-static volatile unsigned * const fio1clr = (volatile unsigned *) 0x2009c03c;
+#endif
 
 inline void feed_pll()
 {

@@ -1,4 +1,4 @@
-opt := -g
+opt := -g -Os
 
 linker-script := lpc-1766-stk.ld
 
@@ -29,7 +29,7 @@ app: \
     $(addprefix app,$(output-suffixes)) \
     $(preprocs) \
     $(genassms)
-flash: app; ./flash.py app.elf
+flash: app; ./flash.py app.bin
 clean:; rm -f $(sort $(strip \
     *.d \
     *.o \

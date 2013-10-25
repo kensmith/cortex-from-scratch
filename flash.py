@@ -17,6 +17,6 @@ def cmd(c, s):
 
 cmd('reset halt', 1)
 #cmd('flash write_image erase unlock ' + sys.argv[1] + ' 0x0 bin\r', 500)
-cmd('flash write_image ' + sys.argv[1], 500)
-cmd('verify_image app.bin 0x0 bin', 500)
+cmd('flash write_image erase unlock ' + sys.argv[1] + ' 0x0 bin', 500)
+cmd('verify_image ' + sys.argv[1] + ' 0x0 bin', 500)
 cmd('reset init', 1)
