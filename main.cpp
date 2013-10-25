@@ -1,8 +1,6 @@
 #include "main.hpp"
 #include "stk.hpp"
 
-namespace lpc = lpc1766;
-
 //TODO refactor register access
 // 1720 bytes before refactor
 // candidate instructions
@@ -85,7 +83,8 @@ void configure_pll0(void)
 	str	r2, [r3]
  */
 #else
-   lpc::scs::oscen::set();
+   using oscen = lpc1766::scs::oscen;
+   oscen::set();
    /*
 	.loc 1 46 0
 	add	r3, r3, #416
@@ -238,7 +237,8 @@ void configure_pll0(void)
 
 int main(void)
 {
-   using led = lpc::stk::led_t;
+   using led = lpc1766::stk::led_t;
+
    configure_pll0();
 
    // light up all the peripherals
