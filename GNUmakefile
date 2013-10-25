@@ -19,8 +19,8 @@ $(foreach suffix,$(src-suffixes), \
  )
 header-deps := $(objs:.o=.d)
 secondary-processed := $(filter-out boot.%,$(objs))
-preprocs := $(if $(preproc),$(secondary-processed:.o=.E))
-genassms := $(if $(genassm),$(secondary-processed:.o=.S))
+preprocs := $(secondary-processed:.o=.E)
+genassms := $(secondary-processed:.o=.S)
 
 output-suffixes := .elf .bin .xxd
 

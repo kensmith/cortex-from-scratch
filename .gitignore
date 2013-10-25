@@ -1,5 +1,7 @@
 *.o
 *.d
+*.S
+*.E
 app.*
 core*
 cscope*

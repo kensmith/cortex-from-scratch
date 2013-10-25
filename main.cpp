@@ -1,6 +1,14 @@
 #include "main.hpp"
 
 //TODO refactor register access
+// candidate instructions
+// SBFX Rd, Rn, #lsb, #width Signed Bit Field Extract - page 3-58
+// STR Rt, [Rn, #offset] Store Register word - page 3-17
+// STRB, STRBT Rt, [Rn, #offset] Store Register byte - page 3-17
+// STRD Rt, Rt2, [Rn, #offset] Store Register two words - page 3-19
+// STREX Rd, Rt, [Rn, #offset] Store Register Exclusive - page 3-31
+// STREXB Rd, Rt, [Rn] Store Register Exclusive Byte - page 3-31
+// STREXH Rd, Rt, [Rn] Store Register Exclusive Halfword - page 3-31
 
 static volatile unsigned * const scs = (volatile unsigned *) 0x400fc1a0;
 static volatile unsigned * const pll0stat = (volatile unsigned *) 0x400fc088;
@@ -36,25 +44,63 @@ static volatile unsigned * const pinsel3 = (volatile unsigned *) 0x4002c00c;
 inline void feed_pll()
 {
    *pll0feed = 0xaa;
+#if 0
+	movs	r2, #170
+	str	r2, [r3, #12]
+#endif
    *pll0feed = 0x55;
+#if 0
+	movs	r2, #85
+	str	r2, [r3, #12]
+#endif
 }
 
 void configure_pll0(void)
 {
    // max wait state while configuring pll0
    *flashcfg = (5<<12) | 0x3a;
+#if 0
+	ldr	r3, .L5
+	movw	r2, #20538
+	str	r2, [r3]
+.L5:
+	.word	1074774016
+	.word	1074774144
+#endif
 
    *scs = (1<<5); // enable main oscillator
+#if 0
+   movs	r2, #32
+   str	r2, [r3, #416]
+#endif
+
    while (0 == (*scs & (1<<6)))
    {
       // wait for the main oscilator to stabilize
    }
+#if 0
+.L3:
+	.loc 1 66 0 discriminator 1
+	ldr	r2, [r3]
+	lsls	r2, r2, #25
+	bpl	.L3
+#endif
    // lpc17xx_um.pdf, 4.5.13 PLL0 setup sequence
    // 1. Disconnect PLL0 with one feed sequence if PLL0 is already connected.
    // ks: not necessary after reboot, defaults to disconnected    
    *pll0con &= ~((unsigned) 1<<1);
-   feed_pll();
+#if 0
+	ldr	r3, .L5+4
+	ldr	r2, [r3]
+	bic	r2, r2, #2
+	str	r2, [r3]
+.L5:
+	.word	1074774016
+	.word	1074774144
+#endif
 
+   feed_pll();
+#if 1
    *pll0con &= ~((unsigned) 1<<0);
    feed_pll();
 
@@ -146,6 +192,7 @@ void configure_pll0(void)
    feed_pll();
 
    //*flashcfg = (4<<12) | 0x3a;
+#endif
 }
 
 int main(void)
@@ -160,6 +207,17 @@ int main(void)
    // pinsel3
    //*pinsel3 = 0;
    *fio1dir = 1<<25;
+#if 0
+	ldr	r3, .L22+4
+	mov	r2, #33554432
+	str	r2, [r3]
+.L22:
+	.word	1074774212
+	.word	537509920
+	.word	537509944
+	.word	6400000
+	.word	537509948
+#endif
 
    // light led2
    // pin 81 p0[4]
