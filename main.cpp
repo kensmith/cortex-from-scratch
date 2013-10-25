@@ -1,7 +1,7 @@
 #include "main.hpp"
-#include "lpc1766.hpp"
+#include "stk.hpp"
 
-using lpc = lpc1766;
+namespace lpc = lpc1766;
 
 //TODO refactor register access
 // 1720 bytes before refactor
@@ -236,27 +236,9 @@ void configure_pll0(void)
 #endif
 }
 
-struct led_t
-{
-   static void enable()
-   {
-      lpc::fio<1>::pin<25>::dir::set();
-   }
-
-   static void on()
-   {
-      lpc::fio<1>::pin<25>::clr::set();
-   }
-
-   static void off()
-   {
-      lpc::fio<1>::pin<25>::set::set();
-   }
-};
-
-
 int main(void)
 {
+   using led = lpc::stk::led_t;
    configure_pll0();
 
    // light up all the peripherals
@@ -266,7 +248,7 @@ int main(void)
    // pin 39 p1[25]
    // pinsel3
    //*pinsel3 = 0;
-   led_t::enable();
+   led::enable();
 
    // light led2
    // pin 81 p0[4]
@@ -275,11 +257,11 @@ int main(void)
    {
       for (int i = 6400000; i > 0; --i)
       {
-         led_t::on();
+         led::on();
       }
       for (int i = 6400000; i > 0; --i)
       {
-         led_t::off();
+         led::off();
       }
    }
 }

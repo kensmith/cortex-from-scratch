@@ -7,7 +7,7 @@
  * The MMIO registers for the LPC1766 that is integrated
  * into the Olimex LPC1766-STK.
  */
-struct lpc1766
+namespace lpc1766
 {
    struct scs
    {
@@ -15,7 +15,6 @@ struct lpc1766
       using oscrange = reg_t<rw_t, addr, 4, 1>;
       using oscen = reg_t<rw_t, addr, 5, 1>;
       using oscstat = reg_t<rw_t, addr, 6, 1>;
-      using whole = reg_t<rw_t, addr, 0, 32>;
    };
 
    template <int which_fio>
@@ -46,4 +45,4 @@ struct lpc1766
          using pllc = reg_t<rw_t, base_addr, 1, 1>;
       };
    };
-};
+}
