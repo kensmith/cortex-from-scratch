@@ -1,4 +1,4 @@
-#include "stk.hpp"
+#include "lpc1766-stk.hpp"
 
 int main(void)
 {

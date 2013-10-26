@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lpc1766.hpp"
+#include "lpc1766-reg.hpp"
 
 static volatile unsigned * const scs = (volatile unsigned *) 0x400fc1a0;
 static volatile unsigned * const pll0stat = (volatile unsigned *) 0x400fc088;
@@ -72,8 +72,6 @@ namespace lpc1766
       {
          static void configure()
          {
-            using stk = lpc1766::stk;
-
             *flashcfg = (5<<12) | 0x3a;
 
             stk::oscillator_t::enable();
