@@ -1,5 +1,4 @@
 #include "isr_vectors.hpp"
-#include "main.hpp"
 
 __attribute__ ((section(".isr_vector_first_six"))) void (* const isr_vectors[])() =
 {
@@ -57,6 +56,7 @@ __attribute__ ((section(".isr_vector_rest"))) void (* const isr_vector_rest[])()
    can_activity_handler,
 };
 
+int main();
 void reset_handler(void)
 {
    main();
