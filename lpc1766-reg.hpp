@@ -101,7 +101,12 @@ namespace lpc1766
          using pllc = reg_t<rw_t, base_addr, 1, 1>;
 
       };
-      static void enable() { con::plle::write(1); feed();}
+      static void enable()
+      {
+         con::plle::write(1);
+         feed();
+         wait_for_lock();
+      }
       static void disable() { con::plle::write(0); feed();}
       static void connect() { con::pllc::write(1); feed();}
       static void disconnect() { con::pllc::write(0); feed();}
@@ -143,6 +148,13 @@ namespace lpc1766
          return stat::plock::read() == 1;
       }
 
+      static void wait_for_lock()
+      {
+         while (!locked())
+         {
+         }
+      }
+
       /**
        * 4.5.8 PLL0 Feed register (PLL0FEED - 0x400F C08C)
        */
@@ -168,5 +180,26 @@ namespace lpc1766
       static_assert(0 <= which && which <= 1, "invalid pclksel");
       static constexpr unsigned addr = 0x400fc1a8+which*4;
       using whole = reg_t<rw_t, addr, 0, 32>;
+   };
+
+   /**
+    * 4.7.1 CPU Clock Configuration register (CCLKCFG -
+    * 0x400F C104)
+    */
+   struct cclkcfg
+   {
+      static constexpr unsigned addr = 0x400fc104;
+      using cclksel = reg_t<rw_t, addr, 0, 8>;
+
+      template <int value>
+      struct divider
+      {
+         static_assert(1 <= value && value <= 256, "invalid clock divider");
+         ~divider()
+         {
+            cclksel::write(value - 1);
+            pll<0>::wait_for_lock();
+         }
+      };
    };
 }
