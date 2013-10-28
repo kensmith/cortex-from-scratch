@@ -50,6 +50,9 @@ namespace lpc1766
 
       struct pll_t
       {
+         static constexpr int base_freq = 480e6;
+         static constexpr int divisor = 5;
+         static constexpr int cpu_freq = base_freq / divisor;
          static void configure()
          {
             flashcfg::use<5>::clocks();
@@ -69,7 +72,7 @@ namespace lpc1766
 
             pll<0>::enable();
 
-            cclkcfg::divider<5>();
+            cclkcfg::divider<divisor>();
             pll<0>::connect();
          }
       };
