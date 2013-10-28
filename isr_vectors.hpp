@@ -2,6 +2,11 @@
 
 //extern void (* const isr_vectors[])(void);
 
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
 void reset_handler(void) __attribute__ ((interrupt ("IRQ")));
 void nmi_handler(void) __attribute__ ((interrupt ("IRQ")));
 void hard_fault_handler(void) __attribute__ ((interrupt ("IRQ")));
@@ -48,3 +53,7 @@ void qei_handler(void) __attribute__ ((interrupt ("IRQ")));
 void pll1_handler(void) __attribute__ ((interrupt ("IRQ")));
 void usb_activity_handler(void) __attribute__ ((interrupt ("IRQ")));
 void can_activity_handler(void) __attribute__ ((interrupt ("IRQ")));
+
+#if defined(__cplusplus)
+}
+#endif
