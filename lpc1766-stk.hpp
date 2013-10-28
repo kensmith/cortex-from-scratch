@@ -41,13 +41,37 @@ namespace lpc1766
          static void off() { fio<1>::pin<25>::set::set(); }
       };
 
-      struct oscillator_t
-      {
-         static void enable() { scs::oscen::set(); }
-
-         static bool ready() { return scs::oscstat::read() == 1; }
-      };
-
+      /**
+       * PLL configuration for driving the main CPU clock.
+       * The input clock is 12MHz. A particularly useful and
+       * divisible PLL value is 480MHz. The max CPU
+       * frequency is 100MHz so the closest we get with that
+       * PLL is 96MHz (div=5). Other values are:
+       *
+       * div, cpu_freq
+       * 5, 96
+       * 6, 80
+       * 8, 60
+       * 10, 48
+       * 12, 40
+       * 15, 32
+       * 16, 30
+       * 20, 24
+       * 24, 20
+       * 30, 16
+       * 32, 15
+       * 40, 12
+       * 48, 10
+       * 60, 8
+       * 80, 6
+       * 96, 5
+       * 120, 4
+       * 160, 3
+       * 240, 2
+       *
+       * Of course, messing with the main clock makes JTAG
+       * configuration more fun.
+       */
       struct pll_t
       {
          static constexpr int base_freq = 480e6;
