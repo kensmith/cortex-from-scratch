@@ -1,7 +1,5 @@
 #pragma once
 
-//extern void (* const isr_vectors[])(void);
-
 #if defined(__cplusplus)
 extern "C" {
 #endif

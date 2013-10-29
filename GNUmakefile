@@ -1,4 +1,4 @@
-opt := -g -Os
+opt := -g -Og
 
 linker-script := lpc-1766-stk.ld
 

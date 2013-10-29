@@ -2,6 +2,9 @@
 
 #include "lpc1766-reg.hpp"
 
+extern char __bss_start__;
+extern char __bss_end__;
+
 namespace lpc1766
 {
    struct stk
@@ -11,6 +14,16 @@ namespace lpc1766
          pconp::whole::write(~0U);
          pll_t::configure();
          led_t::enable();
+
+         for (
+            volatile char* c = &__bss_start__;
+            c < &__bss_end__;
+            ++c)
+         {
+            *c = 0;
+         }
+
+         // TODO copy data segment to RAM
       }
 
       struct led_t
@@ -79,5 +92,7 @@ namespace lpc1766
             pll<0>::connect();
          }
       };
+
+      using led = led_t;
    };
 }

@@ -1,7 +1,10 @@
 #include "isr_vectors.hpp"
+#include "board.hpp"
 
 void reset_handler(void)
 {
+   board::init();
+
    int main();
    main();
 
