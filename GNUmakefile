@@ -1,4 +1,4 @@
-opt := -g -O3
+opt := -g -Og
 
 linker-script := lpc-1766-stk.ld
 
@@ -57,6 +57,8 @@ app.elf \
       -mthumb \
       -std=gnu++0x \
       -nostartfiles \
+      -nostdlib \
+      -nodefaultlibs \
       -mfpu=vfp \
       -mcpu=cortex-m3 \
       -march=armv7-m \
@@ -76,6 +78,11 @@ assembler-flags := $(strip \
     -mthumb \
     -msoft-float \
     -mfpu=vfp \
+    -nostartfiles \
+    -nostdlib \
+    -nodefaultlibs \
+    -fno-rtti \
+    -fno-exceptions \
     -mcpu=cortex-m3 \
     -march=armv7-m)
 

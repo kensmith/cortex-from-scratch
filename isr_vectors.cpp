@@ -1,64 +1,8 @@
 #include "isr_vectors.hpp"
 
-__attribute__ ((section(".isr_vector_first_six"))) void (* const isr_vectors[])() =
-{
-    reset_handler,
-    nmi_handler,
-    hard_fault_handler,
-    memory_management_fault_handler,
-    bus_fault_handler,
-    usage_fault_handler,
-};
-
-__attribute__ ((section(".isr_sv_call"))) void (* const isr_sv_call[])() =
-{
-   sv_call_handler,
-};
-
-__attribute__ ((section(".isr_vector_rest"))) void (* const isr_vector_rest[])() =
-{
-   pend_sv_handler,
-   sys_tick_handler,
-   wdt_handler,
-   timer0_handler,
-   timer1_handler,
-   timer2_handler,
-   timer3_handler,
-   uart0_handler,
-   uart1_handler,
-   uart2_handler,
-   uart3_handler,
-   pwm1_handler,
-   i2c0_handler,
-   i2c1_handler,
-   i2c2_handler,
-   spi_handler,
-   ssp0_handler,
-   ssp1_handler,
-   pll0_handler,
-   rtc_handler,
-   eint0_handler,
-   eint1_handler,
-   eint2_handler,
-   eint3_handler,
-   adc_handler,
-   bod_handler,
-   usb_handler,
-   can_handler,
-   dma_handler,
-   i2s_handler,
-   emac_handler,
-   rit_handler,
-   mc_pwm_handler,
-   qei_handler,
-   pll1_handler,
-   usb_activity_handler,
-   can_activity_handler,
-};
-
-int main();
 void reset_handler(void)
 {
+   int main();
    main();
 
    while(1);
@@ -278,4 +222,60 @@ void can_activity_handler(void)
 {
    while (1);
 }
+
+void (* const isr_vectors[])() =
+{
+    reset_handler,
+    nmi_handler,
+    hard_fault_handler,
+    memory_management_fault_handler,
+    bus_fault_handler,
+    usage_fault_handler,
+};
+
+void (* const isr_sv_call[])() =
+{
+   sv_call_handler,
+};
+
+void (* const isr_vector_rest[])() =
+{
+   pend_sv_handler,
+   sys_tick_handler,
+   wdt_handler,
+   timer0_handler,
+   timer1_handler,
+   timer2_handler,
+   timer3_handler,
+   uart0_handler,
+   uart1_handler,
+   uart2_handler,
+   uart3_handler,
+   pwm1_handler,
+   i2c0_handler,
+   i2c1_handler,
+   i2c2_handler,
+   spi_handler,
+   ssp0_handler,
+   ssp1_handler,
+   pll0_handler,
+   rtc_handler,
+   eint0_handler,
+   eint1_handler,
+   eint2_handler,
+   eint3_handler,
+   adc_handler,
+   bod_handler,
+   usb_handler,
+   can_handler,
+   dma_handler,
+   i2s_handler,
+   emac_handler,
+   rit_handler,
+   mc_pwm_handler,
+   qei_handler,
+   pll1_handler,
+   usb_activity_handler,
+   can_activity_handler,
+};
 

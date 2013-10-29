@@ -3,8 +3,7 @@
 //extern void (* const isr_vectors[])(void);
 
 #if defined(__cplusplus)
-extern "C"
-{
+extern "C" {
 #endif
 
 void reset_handler(void) __attribute__ ((interrupt ("IRQ")));
@@ -54,6 +53,11 @@ void pll1_handler(void) __attribute__ ((interrupt ("IRQ")));
 void usb_activity_handler(void) __attribute__ ((interrupt ("IRQ")));
 void can_activity_handler(void) __attribute__ ((interrupt ("IRQ")));
 
+__attribute__ ((section(".isr_vector_first_six"))) extern void (* const isr_vectors[])();
+__attribute__ ((section(".isr_sv_call"))) extern void (* const isr_sv_call[])();
+__attribute__ ((section(".isr_vector_rest"))) extern void (* const isr_vector_rest[])();
+
 #if defined(__cplusplus)
 }
 #endif
+
