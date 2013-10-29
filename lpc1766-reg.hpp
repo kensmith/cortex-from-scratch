@@ -11,6 +11,16 @@
 namespace lpc1766
 {
    /**
+    * 4.8.9 Power Control for Peripherals register (PCONP -
+    * 0x400F C0C4)
+    */
+   struct pconp
+   {
+      static constexpr unsigned addr = 0x400fc0c4;
+      using whole = reg_t<rw_t, addr, 0, 32>;
+   };
+
+   /**
     * 3.7.1 System Controls and Status register (SCS -
     * 0x400F C1A0)
     */
