@@ -36,7 +36,7 @@ SECTIONS
 
         . = 0x2c;
         *(.isr_sv_call)
-        . = 0x3c;
+        . = 0x38;
         *(.isr_vector_rest)
         . = 0x400;
         *(.text*)
