@@ -8,6 +8,9 @@ extern char __data_size__;
 extern unsigned __data_start;
 extern unsigned __end_of_flash;
 
+/**
+ * TODO enable timer tick, ch 23
+ */
 namespace lpc1766
 {
    struct stk
