@@ -18,7 +18,7 @@ namespace lpc1766
       static void zero_bss_segment()
       {
          for (
-            volatile char* c = &__bss_start__;
+            char* c = &__bss_start__;
             c < &__bss_end__;
             ++c)
          {
@@ -28,10 +28,10 @@ namespace lpc1766
 
       static void init_data_segment()
       {
-         volatile int data_size = reinterpret_cast<int>(&__data_size__);
-         volatile unsigned* src = &__end_of_flash;
-         volatile unsigned* dst = &__data_start;
-         for (volatile int i = 0; i < data_size; i += sizeof(unsigned))
+         int data_size = reinterpret_cast<int>(&__data_size__);
+         unsigned* src = &__end_of_flash;
+         unsigned* dst = &__data_start;
+         for (int i = 0; i < data_size; i += sizeof(unsigned))
          {
             dst[i] = src[i];
          }
@@ -44,7 +44,9 @@ namespace lpc1766
          led_t::enable();
 
          zero_bss_segment();
+#if 1
          init_data_segment();
+#endif
       }
 
       struct led_t

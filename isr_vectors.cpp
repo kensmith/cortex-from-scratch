@@ -1,227 +1,246 @@
 #include "isr_vectors.hpp"
 #include "board.hpp"
 
-void reset_handler(void)
+[[noreturn]] void reset_handler(void)
 {
    board::init();
-
-   int main();
-   main();
-
+   asm("b main");
    while(1);
 }
 
-void nmi_handler(void)
+[[noreturn]] void nmi_handler(void)
 {
    while (1);
 }
 
-void hard_fault_handler(void)
+/**
+ * 34.4.3.12 Hard Fault Status Register
+ */
+[[noreturn]] void hard_fault_handler(void)
+{
+   using hfsr = lpc1766::scb::hfsr;
+   using ufsr = lpc1766::scb::ufsr;
+   volatile unsigned hfsr_val = hfsr::whole::read();
+   ++hfsr_val;
+
+   if (hfsr::debugevt::read())
+   {
+      while(1);
+   }
+   else if (hfsr::forced::read())
+   {
+      volatile unsigned ufsr_val = ufsr::whole::read();
+      ufsr_val |= 0x80000000;
+      while(ufsr_val);
+   }
+   else if (hfsr::vecttbl::read())
+   {
+      while(1);
+   }
+   while(1);
+}
+
+[[noreturn]] void memory_management_fault_handler(void)
 {
    while (1);
 }
 
-void memory_management_fault_handler(void)
+[[noreturn]] void bus_fault_handler(void)
 {
    while (1);
 }
 
-void bus_fault_handler(void)
+[[noreturn]] void usage_fault_handler(void)
 {
    while (1);
 }
 
-void usage_fault_handler(void)
+[[noreturn]] void sv_call_handler(void)
 {
    while (1);
 }
 
-void sv_call_handler(void)
+[[noreturn]] void pend_sv_handler(void)
 {
    while (1);
 }
 
-void pend_sv_handler(void)
+[[noreturn]] void sys_tick_handler(void)
 {
    while (1);
 }
 
-void sys_tick_handler(void)
+[[noreturn]] void wdt_handler(void)
 {
    while (1);
 }
 
-void wdt_handler(void)
+[[noreturn]] void timer0_handler(void)
 {
    while (1);
 }
 
-void timer0_handler(void)
+[[noreturn]] void timer1_handler(void)
 {
    while (1);
 }
 
-void timer1_handler(void)
+[[noreturn]] void timer2_handler(void)
 {
    while (1);
 }
 
-void timer2_handler(void)
+[[noreturn]] void timer3_handler(void)
 {
    while (1);
 }
 
-void timer3_handler(void)
+[[noreturn]] void uart0_handler(void)
 {
    while (1);
 }
 
-void uart0_handler(void)
+[[noreturn]] void uart1_handler(void)
 {
    while (1);
 }
 
-void uart1_handler(void)
+[[noreturn]] void uart2_handler(void)
 {
    while (1);
 }
 
-void uart2_handler(void)
+[[noreturn]] void uart3_handler(void)
 {
    while (1);
 }
 
-void uart3_handler(void)
+[[noreturn]] void pwm1_handler(void)
 {
    while (1);
 }
 
-void pwm1_handler(void)
+[[noreturn]] void i2c0_handler(void)
 {
    while (1);
 }
 
-void i2c0_handler(void)
+[[noreturn]] void i2c1_handler(void)
 {
    while (1);
 }
 
-void i2c1_handler(void)
+[[noreturn]] void i2c2_handler(void)
 {
    while (1);
 }
 
-void i2c2_handler(void)
+[[noreturn]] void spi_handler(void)
 {
    while (1);
 }
 
-void spi_handler(void)
+[[noreturn]] void ssp0_handler(void)
 {
    while (1);
 }
 
-void ssp0_handler(void)
+[[noreturn]] void ssp1_handler(void)
 {
    while (1);
 }
 
-void ssp1_handler(void)
+[[noreturn]] void pll0_handler(void)
 {
    while (1);
 }
 
-void pll0_handler(void)
+[[noreturn]] void rtc_handler(void)
 {
    while (1);
 }
 
-void rtc_handler(void)
+[[noreturn]] void eint0_handler(void)
 {
    while (1);
 }
 
-void eint0_handler(void)
+[[noreturn]] void eint1_handler(void)
 {
    while (1);
 }
 
-void eint1_handler(void)
+[[noreturn]] void eint2_handler(void)
 {
    while (1);
 }
 
-void eint2_handler(void)
+[[noreturn]] void eint3_handler(void)
 {
    while (1);
 }
 
-void eint3_handler(void)
+[[noreturn]] void adc_handler(void)
 {
    while (1);
 }
 
-void adc_handler(void)
+[[noreturn]] void bod_handler(void)
 {
    while (1);
 }
 
-void bod_handler(void)
+[[noreturn]] void usb_handler(void)
 {
    while (1);
 }
 
-void usb_handler(void)
+[[noreturn]] void can_handler(void)
 {
    while (1);
 }
 
-void can_handler(void)
+[[noreturn]] void dma_handler(void)
 {
    while (1);
 }
 
-void dma_handler(void)
+[[noreturn]] void i2s_handler(void)
 {
    while (1);
 }
 
-void i2s_handler(void)
+[[noreturn]] void emac_handler(void)
 {
    while (1);
 }
 
-void emac_handler(void)
+[[noreturn]] void rit_handler(void)
 {
    while (1);
 }
 
-void rit_handler(void)
+[[noreturn]] void mc_pwm_handler(void)
 {
    while (1);
 }
 
-void mc_pwm_handler(void)
+[[noreturn]] void qei_handler(void)
 {
    while (1);
 }
 
-void qei_handler(void)
+[[noreturn]] void pll1_handler(void)
 {
    while (1);
 }
 
-void pll1_handler(void)
+[[noreturn]] void usb_activity_handler(void)
 {
    while (1);
 }
 
-void usb_activity_handler(void)
-{
-   while (1);
-}
-
-void can_activity_handler(void)
+[[noreturn]] void can_activity_handler(void)
 {
    while (1);
 }

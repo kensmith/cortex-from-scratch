@@ -36,6 +36,14 @@ SECTIONS
 
         . = 0x2c;
         *(.isr_sv_call)
+        /*
+         * 34.3.3.4 says isr_vector_rest starts at 0x3c.
+         * 6.3, table 50 says wdt handler is at 0x40
+         * order is pend_sv, sys_tick, wdt.
+         * If we start at 0x3c=pend_sv, sys_tick is 0x40 and
+         * wdt is 0x44. When implementing the handlers,
+         * figure out which is correct experimentally.
+         */
         . = 0x38;
         *(.isr_vector_rest)
         . = 0x400;

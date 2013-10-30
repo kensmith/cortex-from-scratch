@@ -57,8 +57,6 @@ app.elf \
       -mthumb \
       -std=gnu++0x \
       -nostartfiles \
-      -nostdlib \
-      -nodefaultlibs \
       -mfpu=vfp \
       -mcpu=cortex-m3 \
       -march=armv7-m \
@@ -79,8 +77,6 @@ assembler-flags := $(strip \
     -msoft-float \
     -mfpu=vfp \
     -nostartfiles \
-    -nostdlib \
-    -nodefaultlibs \
     -fno-rtti \
     -fno-exceptions \
     -mcpu=cortex-m3 \
