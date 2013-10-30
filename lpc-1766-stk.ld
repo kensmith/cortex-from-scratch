@@ -79,6 +79,7 @@ SECTIONS
         *(.data*)
         __data_end = .;
     } > SRAM
+    PROVIDE(__data_size__ = __data_end - __data_start);
 
     __stack_size = 8192;
     __heap_start = .;

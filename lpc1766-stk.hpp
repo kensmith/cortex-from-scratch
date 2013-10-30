@@ -4,17 +4,16 @@
 
 extern char __bss_start__;
 extern char __bss_end__;
+extern char __data_size__;
+extern unsigned __data_start;
+extern unsigned __end_of_flash;
 
 namespace lpc1766
 {
    struct stk
    {
-      static void init()
+      static void zero_bss_segment()
       {
-         pconp::whole::write(~0U);
-         pll_t::configure();
-         led_t::enable();
-
          for (
             volatile char* c = &__bss_start__;
             c < &__bss_end__;
@@ -22,8 +21,27 @@ namespace lpc1766
          {
             *c = 0;
          }
+      }
 
-         // TODO copy data segment to RAM
+      static void init_data_segment()
+      {
+         volatile int data_size = reinterpret_cast<int>(&__data_size__);
+         volatile unsigned* src = &__end_of_flash;
+         volatile unsigned* dst = &__data_start;
+         for (volatile int i = 0; i < data_size; i += sizeof(unsigned))
+         {
+            dst[i] = src[i];
+         }
+      }
+
+      static void init()
+      {
+         pconp::whole::write(~0U);
+         pll_t::configure();
+         led_t::enable();
+
+         zero_bss_segment();
+         init_data_segment();
       }
 
       struct led_t
