@@ -20,8 +20,6 @@
 {
    using hfsr = lpc1766::scb::hfsr;
    using ufsr = lpc1766::scb::ufsr;
-   volatile unsigned hfsr_val = hfsr::whole::read();
-   ++hfsr_val;
 
    if (hfsr::debugevt::read())
    {
@@ -30,8 +28,13 @@
    else if (hfsr::forced::read())
    {
       volatile unsigned ufsr_val = ufsr::whole::read();
-      ufsr_val |= 0x80000000;
+      volatile unsigned bx_bit = lpc1766::id_isar1::bx_instruction_t_bit::read();
+      volatile unsigned blx_bit = lpc1766::id_isar1::blx_instruction::read();
+      while(ufsr::undefinstr::read());
       while(ufsr_val);
+      while(bx_bit);
+      while(blx_bit);
+      while(1);
    }
    else if (hfsr::vecttbl::read())
    {
@@ -301,3 +304,8 @@ void (* const isr_vector_rest[])() =
    can_activity_handler,
 };
 
+int foo();
+int foo()
+{
+   return 10;
+}

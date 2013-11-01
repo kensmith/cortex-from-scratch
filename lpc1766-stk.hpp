@@ -17,6 +17,11 @@ namespace lpc1766
    {
       static void zero_bss_segment()
       {
+         // TODO see what happens when bss contains only a
+         // single char
+         //    - does the compiler generate a whole
+         //      word-aligned word for storage?
+         //    - if so, can I use word-wise initialization?
          for (
             char* c = &__bss_start__;
             c < &__bss_end__;
@@ -44,9 +49,7 @@ namespace lpc1766
          led_t::enable();
 
          zero_bss_segment();
-#if 1
          init_data_segment();
-#endif
       }
 
       struct led_t

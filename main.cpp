@@ -7,11 +7,14 @@ namespace
    double start_val2 = 6400000.;
 }
 
+int foo();
+
 // goes in .bss
 static int end_val;
 
 int main(void)
 {
+   end_val = foo();
    while (1)
    {
       start_val2 *= 2;

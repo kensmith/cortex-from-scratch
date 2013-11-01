@@ -10,6 +10,20 @@
  */
 namespace lpc1766
 {
+   template <int which>
+   struct id_isar
+   {
+      static_assert(0 <= which && which <= 4,
+         "invalid instruction set attribute register");
+      static constexpr unsigned addr = 0xe000ed60 + 4*which;
+   };
+
+   struct id_isar1 : id_isar<1>
+   {
+      using bx_instruction_t_bit = reg_t<ro_t, addr, 25, 1>;
+      using blx_instruction = reg_t<ro_t, addr, 26, 1>;
+   };
+
    /**
     * 34.4.3 System control block
     */

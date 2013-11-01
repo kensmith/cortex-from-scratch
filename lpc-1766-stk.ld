@@ -44,7 +44,7 @@ SECTIONS
          * wdt is 0x44. When implementing the handlers,
          * figure out which is correct experimentally.
          */
-        . = 0x38;
+        . = 0x3c;
         *(.isr_vector_rest)
         . = 0x400;
         *(.text*)

@@ -22,7 +22,7 @@ secondary-processed := $(filter-out boot.%,$(objs))
 preprocs := $(secondary-processed:.o=.E)
 genassms := $(secondary-processed:.o=.S)
 
-output-suffixes := .elf .bin .xxd
+output-suffixes := .elf .bin .xxd .S .symtab
 
 .PHONY: app flash clean gdb
 app: \
@@ -43,6 +43,14 @@ clean:; rm -f $(sort $(strip \
 gdb:;\
     arm-none-eabi-gdb
 
+app.symtab \
+    : app.elf \
+    ; arm-none-eabi-readelf -s app.elf > $@
+
+app.S \
+    : app.elf \
+    ; arm-none-eabi-objdump -S app.elf > $@
+
 app.xxd \
     : app.bin \
     ; xxd $< > $@
@@ -55,12 +63,10 @@ app.elf \
     : $(objs) \
     ; $(strip arm-none-eabi-g++ \
       -mthumb \
-      -std=gnu++0x \
+      -mno-thumb-interwork \
       -nostartfiles \
-      -mfpu=vfp \
+      -std=c++11 \
       -mcpu=cortex-m3 \
-      -march=armv7-m \
-      -msoft-float \
       -fno-rtti \
       -fno-exceptions \
       $(objs) \
@@ -74,13 +80,12 @@ common-deps := $(strip \
 
 assembler-flags := $(strip \
     -mthumb \
-    -msoft-float \
-    -mfpu=vfp \
+    -mno-thumb-interwork \
     -nostartfiles \
-    -fno-rtti \
-    -fno-exceptions \
+    -std=c++11 \
     -mcpu=cortex-m3 \
-    -march=armv7-m)
+    -fno-rtti \
+    -fno-exceptions)
 
 compiler-flags = $(strip \
     $(if $(filter ARM%,$@), \
@@ -104,7 +109,7 @@ c-compiler-flags = \
 
 c++-compiler-flags = \
     $(compiler-flags) \
-    -std=gnu++0x
+    -std=c++11
 
 
 %.o \
