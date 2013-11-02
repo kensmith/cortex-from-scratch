@@ -11,6 +11,71 @@
 namespace lpc1766
 {
    template <int which>
+   struct uart_base_addr;
+
+   template <>
+   struct uart_base_addr<0>
+   {
+      static constexpr unsigned value = 0x4000c000;
+   };
+
+   template <>
+   struct uart_base_addr<1>
+   {
+      static constexpr unsigned value = 0x40098000;
+   };
+
+   template <>
+   struct uart_base_addr<2>
+   {
+      static constexpr unsigned value = 0x4009c000;
+   };
+
+   template <int which>
+   struct uart
+   {
+      static constexpr unsigned base_addr =
+         uart_base_addr<which>::value;
+      struct dl
+      {
+         static constexpr unsigned addr = base_addr;
+         using lsb = reg_t<rw_t, addr, 0, 8>;
+         using msb = reg_t<rw_t, addr+4, 0, 8>;
+      };
+
+      struct lsr
+      {
+         static constexpr unsigned addr = base_addr + 0x14;
+         using rdr = reg_t<ro_t, addr, 0, 1>;
+         using oe = reg_t<ro_t, addr, 1, 1>;
+         using pe = reg_t<ro_t, addr, 2, 1>;
+         using fe = reg_t<ro_t, addr, 3, 1>;
+         using bi = reg_t<ro_t, addr, 4, 1>;
+         using thre = reg_t<ro_t, addr, 5, 1>;
+         using temt = reg_t<ro_t, addr, 6, 1>;
+         using rxfe = reg_t<ro_t, addr, 7, 1>;
+      };
+
+      struct thr
+      {
+         static constexpr unsigned addr = base_addr;
+         using value = reg_t<wo_t, addr, 0, 8>;
+      };
+
+      struct fdr
+      {
+         static constexpr unsigned addr = base_addr + 0x28;
+         using divaddval = reg_t<rw_t, addr, 0, 4>;
+         using mulval = reg_t<rw_t, addr, 4, 4>;
+      };
+      struct lcr
+      {
+         static constexpr unsigned addr = base_addr + 0xc;
+         using dlab = reg_t<rw_t, addr, 7, 1>;
+      };
+   };
+
+   template <int which>
    struct id_isar
    {
       static_assert(0 <= which && which <= 4,
@@ -258,6 +323,11 @@ namespace lpc1766
       static_assert(0 <= which && which <= 1, "invalid pclksel");
       static constexpr unsigned addr = 0x400fc1a8+which*4;
       using whole = reg_t<rw_t, addr, 0, 32>;
+   };
+
+   struct pclksel0 : pclksel<0>
+   {
+      using uart0 = reg_t<rw_t, addr, 6, 2>;
    };
 
    /**

@@ -34,6 +34,7 @@ namespace lpc1766
          pconp::whole::write(~0U);
          pll_t::configure();
          led_t::enable();
+         uart_t::configure();
 
          zero_bss_segment();
          init_data_segment();
@@ -103,6 +104,53 @@ namespace lpc1766
 
             cclkcfg::divider<divisor>();
             pll<0>::connect();
+         }
+      };
+
+      struct uart_t
+      {
+         static void configure()
+         {
+            pclksel0::uart0::write(2);
+            uart<0>::lcr::dlab::set();
+            uart<0>::dl::msb::clear();
+            uart<0>::dl::lsb::write(2);
+            uart<0>::fdr::divaddval::write(5);
+            uart<0>::fdr::mulval::write(8);
+            uart<0>::lcr::dlab::clear();
+         }
+
+         static void put_char(char c)
+         {
+            while (!uart<0>::lsr::thre::read())
+            {
+               //spin
+            }
+            uart<0>::thr::value::write(c);
+         }
+
+         static int peripheral_clock()
+         {
+            int divisor = 4;
+            switch (pclksel0::uart0::read())
+            {
+               case 0:
+                  break;
+               case 1:
+                  divisor = 1;
+                  break;
+               case 2:
+                  divisor = 2;
+                  break;
+               case 3:
+                  divisor = 8;
+                  break;
+               default:
+                  // TODO report error
+                  break;
+            }
+            const int result = pll_t::cpu_freq / divisor;
+            return result;
          }
       };
 
