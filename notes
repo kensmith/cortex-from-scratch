@@ -1,0 +1,6 @@
+the compiler had been generating blx instructions (branch to ARM) which is
+invalid on cortex-m. this thread helped resolve the issue
+
+http://gcc.gnu.org/ml/gcc-help/2009-02/msg00000.html
+in particular
+http://gcc.gnu.org/ml/gcc-help/2009-02/msg00028.html
