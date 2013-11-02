@@ -303,9 +303,3 @@ void (* const isr_vector_rest[])() =
    usb_activity_handler,
    can_activity_handler,
 };
-
-int foo();
-int foo()
-{
-   return 10;
-}

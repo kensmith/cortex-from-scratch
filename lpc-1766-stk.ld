@@ -79,6 +79,7 @@ SECTIONS
         *(.bss*)
         __bss_end__ = .;
     } > SRAM
+    PROVIDE(__bss_size__ = __bss_end__ - __bss_start__);
 
     .data : AT (__end_of_flash)
     {

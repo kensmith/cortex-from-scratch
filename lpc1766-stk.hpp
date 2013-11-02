@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cstring>
 #include "lpc1766-reg.hpp"
 
 extern char __bss_start__;
 extern char __bss_end__;
+extern char __bss_size__;
 extern char __data_size__;
 extern unsigned __data_start;
 extern unsigned __end_of_flash;
@@ -17,29 +19,14 @@ namespace lpc1766
    {
       static void zero_bss_segment()
       {
-         // TODO see what happens when bss contains only a
-         // single char
-         //    - does the compiler generate a whole
-         //      word-aligned word for storage?
-         //    - if so, can I use word-wise initialization?
-         for (
-            char* c = &__bss_start__;
-            c < &__bss_end__;
-            ++c)
-         {
-            *c = 0;
-         }
+         const int bss_size = reinterpret_cast<int>(&__bss_size__);
+         std::memset(&__bss_start__, 0, bss_size);
       }
 
       static void init_data_segment()
       {
-         int data_size = reinterpret_cast<int>(&__data_size__);
-         unsigned* src = &__end_of_flash;
-         unsigned* dst = &__data_start;
-         for (int i = 0; i < data_size; i += sizeof(unsigned))
-         {
-            dst[i] = src[i];
-         }
+         const int data_size = reinterpret_cast<int>(&__data_size__);
+         std::memcpy(&__data_start, &__end_of_flash, data_size);
       }
 
       static void init()
