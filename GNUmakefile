@@ -35,10 +35,7 @@ clean:; rm -f $(sort $(strip \
     *.o \
     *.E \
     *.S \
-    app.elf \
-    app.bin \
-    app.map \
-    app.xxd))
+    app.*))
 
 gdb:;\
     arm-none-eabi-gdb
