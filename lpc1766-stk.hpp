@@ -111,13 +111,26 @@ namespace lpc1766
       {
          static void configure()
          {
-            pclksel0::uart0::write(2);
+            pconp::uart0::set();
+
+            pinsel<0>::pin<2>::function::write(1);
+            pinsel<0>::pin<3>::function::write(1);
+
+            pclksel0::uart0::write(3);
+
             uart<0>::lcr::dlab::set();
             uart<0>::dl::msb::clear();
-            uart<0>::dl::lsb::write(2);
+            uart<0>::dl::lsb::write(4);
             uart<0>::fdr::divaddval::write(5);
             uart<0>::fdr::mulval::write(8);
             uart<0>::lcr::dlab::clear();
+            uart<0>::lcr::eight_bits();
+
+            uart<0>::fcr::enable_fifo();
+            uart<0>::fcr::tx_fifo_reset::set();
+            uart<0>::fcr::rx_fifo_reset::set();
+
+            uart<0>::ter::txen::set();
          }
 
          static void put_char(char c)

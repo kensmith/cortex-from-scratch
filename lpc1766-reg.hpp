@@ -11,6 +11,29 @@
 namespace lpc1766
 {
    template <int which>
+   struct pinsel
+   {
+      static_assert(0 <= which && which <= 10,
+         "invalid pin select register"
+      );
+      static constexpr unsigned addr = 0x4002c000 + 4*which;
+      template <int name>
+      struct pin
+      {
+         static_assert(0 <= name && name <= 31,
+            "invalid pin name"
+         );
+         using function = reg_t<rw_t, addr, (name % 16) * 2, 2>;
+      };
+   };
+
+   template <int which>
+   struct pinmode
+   {
+      static constexpr unsigned addr = 0x4002c040 + 4*which;
+   };
+
+   template <int which>
    struct uart_base_addr;
 
    template <>
@@ -36,6 +59,28 @@ namespace lpc1766
    {
       static constexpr unsigned base_addr =
          uart_base_addr<which>::value;
+
+      struct ter
+      {
+         static constexpr unsigned addr = base_addr + 0x30;
+         using txen = reg_t<rw_t, addr, 7, 1>;
+      };
+
+      struct fcr
+      {
+         static constexpr unsigned addr = base_addr + 8;
+         using fifo_enable = reg_t<wo_t, addr, 0, 1>;
+         using rx_fifo_reset = reg_t<wo_t, addr, 1, 1>;
+         using tx_fifo_reset = reg_t<wo_t, addr, 2, 1>;
+         using dma_select = reg_t<wo_t, addr, 3, 1>;
+         using rx_trigger_level = reg_t<wo_t, addr, 6, 2>;
+
+         static void enable_fifo()
+         {
+            fifo_enable::set();
+         }
+      };
+
       struct dl
       {
          static constexpr unsigned addr = base_addr;
@@ -71,7 +116,13 @@ namespace lpc1766
       struct lcr
       {
          static constexpr unsigned addr = base_addr + 0xc;
+         using word_length_select = reg_t<rw_t, addr, 0, 2>;
          using dlab = reg_t<rw_t, addr, 7, 1>;
+
+         static void eight_bits()
+         {
+            word_length_select::write(3);
+         }
       };
    };
 
@@ -151,6 +202,7 @@ namespace lpc1766
    {
       static constexpr unsigned addr = 0x400fc0c4;
       using whole = reg_t<rw_t, addr, 0, 32>;
+      using uart0 = reg_t<rw_t, addr, 3, 1>;
    };
 
    /**
