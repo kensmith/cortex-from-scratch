@@ -79,6 +79,16 @@ namespace lpc1766
          {
             fifo_enable::set();
          }
+
+         static void reset_tx_fifo()
+         {
+            tx_fifo_reset::set();
+         }
+
+         static void reset_rx_fifo()
+         {
+            rx_fifo_reset::set();
+         }
       };
 
       struct dl

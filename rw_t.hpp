@@ -19,11 +19,11 @@ struct rw_t : ro_t
       volatile unsigned * device,
       unsigned mask
    )
-   { *device = *device | mask; }
+   { *device |= mask; }
 
    static void clear(
       volatile unsigned * device,
       unsigned mask
    )
-   { *device = *device & ~mask; }
+   { *device &= ~mask; }
 };

@@ -113,6 +113,10 @@ namespace lpc1766
          {
             pconp::uart0::set();
 
+            // ideas
+            // - do a proper interrupt driven DMA driver
+            // - read and double check the values of the
+            //   configuration registers in the debugger
             pinsel<0>::pin<2>::function::write(1);
             pinsel<0>::pin<3>::function::write(1);
 
@@ -124,11 +128,13 @@ namespace lpc1766
             uart<0>::fdr::divaddval::write(5);
             uart<0>::fdr::mulval::write(8);
             uart<0>::lcr::dlab::clear();
+
             uart<0>::lcr::eight_bits();
 
             uart<0>::fcr::enable_fifo();
-            uart<0>::fcr::tx_fifo_reset::set();
-            uart<0>::fcr::rx_fifo_reset::set();
+            uart<0>::fcr::reset_tx_fifo();
+            uart<0>::fcr::reset_rx_fifo();
+            uart<0>::fcr::rx_trigger_level::write(3);
 
             uart<0>::ter::txen::set();
          }
