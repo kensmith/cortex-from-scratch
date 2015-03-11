@@ -1,6 +1,6 @@
 opt := -g -Og
 
-linker-script := lpc-1766-stk.ld
+linker-script := stellaris.ld
 
 srcs := \
     $(wildcard *.cpp) \
