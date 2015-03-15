@@ -21,7 +21,25 @@ SECTIONS
         . = 0x38;
         *(.isr_vector_last_sys_section)
         . = 0x40;
-        *(.isr_vector_rest_section)
-        . = 0x208;
+        *(.isr_vector_rest0_section)
+        . = 0x78;
+        *(.isr_vector_rest1_section)
+        . = 0xb0;
+        *(.isr_vector_rest2_section)
+        . = 0xc4;
+        *(.isr_vector_rest3_section)
+        . = 0xdc;
+        *(.isr_vector_rest4_section)
+        . = 0xec;
+        *(.isr_vector_rest5_section)
+        . = 0xf8;
+        *(.isr_vector_rest6_section)
+        . = 0x124;
+        *(.isr_vector_rest7_section)
+        . = 0x150;
+        *(.isr_vector_rest8_section)
+        . = 0x1b0;
+        *(.isr_vector_rest9_section)
+        . = 0x268;
     } > FLASH
 }

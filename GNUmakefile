@@ -50,7 +50,7 @@ app.S \
 
 app.xxd \
     : app.bin \
-    ; xxd $< > $@
+    ; xxd -g 4 $< > $@
 
 app.bin \
     : app.elf \
