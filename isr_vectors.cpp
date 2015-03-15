@@ -73,7 +73,9 @@ void (* const isr_vector_last_sys[])() =
    sys_tick_handler,
 };
 
-#if 0 // use this to determine if the mapping is correct
+#if 0
+// Use this to determine if the mapping is correct by
+// comparing line numbers here to addresses in app.xxd.
 #define use_default_handler_for(peripheral) \
    reinterpret_cast<void(*)()>(__LINE__)
 #else
